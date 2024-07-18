@@ -1,12 +1,15 @@
 package com.ma.wctool;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Path;
 
 public class WCToolApplicationMain {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+//        Update as needed
+//        You can use a file to get absolute path if necessary
+//        File testFile = new File("src/main/resources/wctest2.txt");
+//        processRequest(new String[] {"-l", "src/main/resources/wctest2.txt"});
+
         if (args.length > 0) {
             try {
                 processRequest(args);
@@ -38,6 +41,9 @@ public class WCToolApplicationMain {
                 case "-l":
                     result.append(getLinesInFile(inputFileBR));
                     break;
+                case "-w":
+                    result.append(getWordCount(inputFileBR));
+                    break;
                 default:
                     result.append("Unrecognised Command: ").append(args[0]);
 
@@ -56,8 +62,6 @@ public class WCToolApplicationMain {
             //Just appending the line can result in removing the system specific line separator causing the byte count to differ
             //compared the terminal wc -c command. Windows separator \r\n is two bytes while the unix one is a single byte
             sb.append(line).append(System.getProperty("line.separator"));
-
-            //Using wctest.txt without the line sep the count was 327900, with it 342190 (which is the same as the built-in wc -c)
         }
 
         return sb.toString().getBytes().length;
@@ -65,5 +69,18 @@ public class WCToolApplicationMain {
 
     private static long getLinesInFile(BufferedReader input) {
         return input.lines().count();
+    }
+
+    private static int getWordCount(BufferedReader input) throws IOException {
+        int count = 0;
+        String line;
+
+        while ((line = input.readLine()) != null) {
+            if (!line.isEmpty()) {
+                count += line.trim().split("\\s+").length;
+            }
+        }
+
+        return count;
     }
 }
